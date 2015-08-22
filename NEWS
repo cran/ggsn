@@ -1,0 +1,16 @@
+ggsn 0.2.0
+==========
+
+* 'ggplot2' includaded as a loaded dependency (previoulsy just imported).
+
+* 'plot' and 'rasterImage' functions imported from graphics.
+
+* function 'symbols' renamed as 'northSymbols' to avoid masking.
+
+* function 'theme_bln' renamed as 'blank'.
+
+
+ggsn 0.1.1
+==========
+
+* First development version.
