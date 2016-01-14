@@ -2,9 +2,10 @@
 #' @description ggplot blank theme.
 #' @export
 #' @examples
-#' library(rgdal)
+#' library(maptools)
 #' dsn <- system.file('extdata', package = 'ggsn')
-#' map <- readOGR(dsn, 'sp')
+#' shp.path <- paste0(dsn, '/sp')
+#' map <- readShapePoly(shp.path)
 #' map@@data$id <- 1:nrow(map@@data)
 #' map.ff <- fortify(map, region = 'id')
 #' map.df <- merge(map.ff, map@@data, by = 'id')

@@ -2,7 +2,7 @@
 #' @description Adds a north symbol to maps created with ggplot or ggmap.
 #' @param data the same \code{\link{data.frame}} passed to \code{\link{ggplot}} to plot the map.
 #' @param location string indicating the symbol's location in the plot. Possible options: "topright" (default), "bottomright", "bottomleft" and "topleft".
-#' @param dist distance in km to represent with the scale bar.
+#' @param dist distance in km to represent with each segment of the scale bar.
 #' @param height number between 0 and 1 to indicate the height of the scale bar, as a proportion of the y axis.
 #' @param st.dist number between 0 and 1 to indicate the distance between the scale bar and the scale bar text, as a proportion of the y axis.
 #' @param st.bottom logical. If TRUE (default) the scale bar text is displayed at the bottom of the scale bar, if FALSE, it is displayed at the top.
@@ -16,11 +16,12 @@
 #' @param y.max if \code{data} is not defined, number with the maximum y coordinate. Useful for ggmap.
 #' @export
 #' @examples
-#' library(rgdal); library(rgeos)
+#' library(maptools)
 #' dsn <- system.file('extdata', package = 'ggsn')
+#' shp.path <- paste0(dsn, '/sp')
 #' 
 #' ## Map in geographic coordinates.
-#' map <- readOGR(dsn, 'sp')
+#' map <- readShapePoly(shp.path)
 #' map@@data$id <- 1:nrow(map@@data)
 #' map.ff <- fortify(map, region = 'id')
 #' map.df <- merge(map.ff, map@@data, by = 'id')
@@ -32,33 +33,6 @@
 #'     scale_fill_brewer(name = 'Animal abuse\nnotifications', palette = 8) +
 #'     scalebar(map.df, dist = 5, dd2km = TRUE, model = 'WGS84')
 #'
-#' ## Map in meter coordinates.
-#' map2 <- spTransform(map, CRS("+init=epsg:31983"))
-#' map2@@data$id <- 1:nrow(map2@@data)
-#' map2.ff <- fortify(map2, region = 'id')
-#' map2.df <- merge(map2.ff, map2@@data, by = 'id')
-#' 
-#' ggplot(data = map2.df, aes(long, lat, group = group, fill = nots)) +
-#'     geom_polygon() +
-#'     coord_equal() +
-#'     geom_path() +
-#'     scale_fill_brewer(name = 'Animal abuse\nnotifications', palette = 8) +
-#'     scalebar(map2.df, dist = 5)
-#'
-#' ggplot(data = map2.df, aes(long, lat, group = group, fill = nots)) +
-#'     geom_polygon() +
-#'     coord_equal() +
-#'     geom_path() +
-#'     scale_fill_brewer(name = 'Animal abuse\nnotifications', palette = 8) +
-#'     scalebar(map2.df, dist = 7, anchor = c(x = 355000, y = 7360000),
-#'              st.bottom = FALSE, st.size = 8)
-#' 
-#' ggplot(data = map2.df, aes(long, lat, group = group, fill = nots)) +
-#'     geom_polygon() +
-#'     coord_equal() +
-#'     geom_path() +
-#'     scale_fill_brewer(name = 'Animal abuse\nnotifications', palette = 8) +
-#'     scalebar(map2.df, location = 'topright', dist = 5)
 scalebar <- function(data = NULL, location = "bottomright", dist, height = 0.02, st.dist = 0.02, st.bottom = TRUE, st.size = 5, dd2km = NULL, model, x.min, x.max, y.min, y.max, anchor = NULL){
     if (is.null(data)) {
         if (is.null(x.min) | is.null(x.max) |

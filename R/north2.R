@@ -9,9 +9,10 @@
 #' North symbols are included in the plot with the \code{\link{annotation_custom}} function, which do not works when used together with an empty call to ggplot (see last example). When it is convenient to use an empty call to ggplot, use \code{\link{north2}} instead.
 #' @export
 #' @examples
-#' library(rgdal); library(rgeos)
+#' library(maptools)
 #' dsn <- system.file('extdata', package = 'ggsn')
-#' map <- readOGR(dsn, 'sp')
+#' shp.path <- paste0(dsn, '/sp')
+#' map <- readShapePoly(shp.path)
 #' map@@data$id <- 1:nrow(map@@data)
 #' map.ff <- fortify(map, region = 'id')
 #' map.df <- merge(map.ff, map@@data, by = 'id')
