@@ -3,11 +3,11 @@
 #' \tabular{ll}{
 #' Package: \tab ggsn\cr
 #' Type: \tab Package\cr
-#' Version: \tab 0.3.0\cr
-#' Date: \tab 2016-01-14\cr
-#' Depends: \tab R (>= 3.2.1), ggplot2\cr
+#' Version: \tab 0.3.1\cr
+#' Date: \tab 2016-07-06\cr
+#' Depends: \tab R (>= 3.3.1), ggplot2\cr
 #' Imports: \tab png, grid, maptools\cr
-#' Suggests: \tab ggmap, rgeos\cr
+#' Suggests: \tab rgdal, ggmap, broom\cr
 #' License: \tab GPL (>= 2)\cr
 #' LazyLoad: \tab yes\cr
 #' URL: \tab \url{https://github.com/oswaldosantos/ggsn}\cr

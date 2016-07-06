@@ -2,11 +2,12 @@
 % Please edit documentation in R/scalebar.R
 \name{scalebar}
 \alias{scalebar}
-\title{North symbol}
+\title{Scale bar}
 \usage{
 scalebar(data = NULL, location = "bottomright", dist, height = 0.02,
   st.dist = 0.02, st.bottom = TRUE, st.size = 5, dd2km = NULL, model,
-  x.min, x.max, y.min, y.max, anchor = NULL)
+  x.min, x.max, y.min, y.max, anchor = NULL, facet.var = NULL,
+  facet.lev = NULL)
 }
 \arguments{
 \item{data}{the same \code{\link{data.frame}} passed to \code{\link{ggplot}} to plot the map.}
@@ -36,20 +37,21 @@ scalebar(data = NULL, location = "bottomright", dist, height = 0.02,
 \item{y.max}{if \code{data} is not defined, number with the maximum y coordinate. Useful for ggmap.}
 
 \item{anchor}{named \code{\link{vector}} with coordinates to control the symbol position. For \code{location = "topright"}, \code{anchor} defines the coordinates of the symbol's topright corner and so forth. The x coordinate must be named as x and the y coordinate as y.}
+
+\item{facet.var}{if faceting, variable name used for faceting. This is useful for placing the scalebar only in one facet and must be used together with \code{facet.lev}.}
+
+\item{facet.lev}{one of the level names in \code{facet.var}. The scale bar will be drawn only in the \code{facet.lev} facet.}
 }
 \description{
-Adds a north symbol to maps created with ggplot or ggmap.
+Adds a scale bar to maps created with ggplot or ggmap.
 }
 \examples{
-library(maptools)
+library(rgdal); library(broom)
 dsn <- system.file('extdata', package = 'ggsn')
-shp.path <- paste0(dsn, '/sp')
-
 ## Map in geographic coordinates.
-map <- readShapePoly(shp.path)
+map <- readOGR(dsn, 'sp')
 map@data$id <- 1:nrow(map@data)
-map.ff <- fortify(map, region = 'id')
-map.df <- merge(map.ff, map@data, by = 'id')
+map.df <- merge(tidy(map), map, by = 'id')
 
 ggplot(data = map.df, aes(long, lat, group = group, fill = nots)) +
     geom_polygon() +

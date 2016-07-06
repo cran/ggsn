@@ -10,13 +10,12 @@ blank()
 ggplot blank theme.
 }
 \examples{
-library(maptools)
+library(rgdal)
+library(broom)
 dsn <- system.file('extdata', package = 'ggsn')
-shp.path <- paste0(dsn, '/sp')
-map <- readShapePoly(shp.path)
+map <- readOGR(dsn, 'sp')
 map@data$id <- 1:nrow(map@data)
-map.ff <- fortify(map, region = 'id')
-map.df <- merge(map.ff, map@data, by = 'id')
+map.df <- merge(tidy(map), map, by = 'id')
 
 ggplot(map.df, aes(long, lat, group = group, fill = nots)) +
       geom_polygon() +
