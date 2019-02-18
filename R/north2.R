@@ -9,27 +9,23 @@
 #' North symbols are included in the plot with the \code{\link{annotation_custom}} function, which do not works when used together with an empty call to ggplot (see last example). When it is convenient to use an empty call to ggplot, use \code{\link{north2}} instead.
 #' @export
 #' @examples
-#' library(rgdal); library(broom)
-#' dsn <- system.file('extdata', package = 'ggsn')
-#' map <- readOGR(dsn, 'sp')
-#' map@@data$id <- 0:(nrow(map@data) - 1)
-#' map.df <- merge(tidy(map), map, by = 'id')
-#' 
-#' map2 <- ggplot(data = map.df, aes(long, lat, group = group, fill = nots)) +
-#'     geom_polygon() +
-#'     coord_equal() +
-#'     geom_path() +
-#'     scale_fill_brewer(name = 'Animal abuse\nnotifications', palette = 8)
-#' 
-#' north2(map2, .5, .5)
+#' \dontrun{
+#' library(sf)
+#' data(domestic_violence)
+#' map <- ggplot(domestic_violence, aes(fill = Scaled)) +
+#'     geom_sf() +
+#'     scale_fill_continuous(low = "#fff7ec", high = "#7F0000") +
+#'     blank()
+#' north2(map, .5, .5, symbol = 10)
+#' }
 north2 <- function(ggp, x = 0.65, y = 0.9, scale = 0.1, symbol = 1) {
     symbol <- sprintf("%02.f", symbol)
-    symbol <- readPNG(paste0(system.file('symbols', package = 'ggsn'),
+    symbol <- png::readPNG(paste0(system.file('symbols', package = 'ggsn'),
                              '/', symbol, '.png'))
-    symbol <- rasterGrob(symbol, interpolate = TRUE)
-    inset <- qplot(0:1, 0:1, geom = "blank") + blank() +
-        annotation_custom(symbol, xmin = 0, xmax = 1, ymin = 0, ymax = 1)
-    vp <- viewport(x, y, scale, scale)
+    symbol <- grid::rasterGrob(symbol, interpolate = TRUE)
+    ins <- qplot(0:1, 0:1, geom = "blank") + blank() +
+        ggmap::inset(symbol, xmin = 0, xmax = 1, ymin = 0, ymax = 1)
+    vp <- grid::viewport(x, y, scale, scale)
     print(ggp)
-    print(inset, vp = vp)
+    print(ins, vp = vp)
 }

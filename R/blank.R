@@ -2,26 +2,14 @@
 #' @description ggplot blank theme.
 #' @export
 #' @examples
-#' library(rgdal)
-#' library(broom)
-#' dsn <- system.file('extdata', package = 'ggsn')
-#' map <- readOGR(dsn, 'sp')
-#' map@@data$id <- 0:(nrow(map@data) - 1)
-#' map.df <- merge(tidy(map), map, by = 'id')
-#' 
-#' ggplot(map.df, aes(long, lat, group = group, fill = nots)) +
-#'       geom_polygon() +
-#'       coord_equal() +
-#'       geom_path() +
-#'       north(map.df) +
-#'       blank()
-#'       
-#' ggplot(map.df, aes(long, lat, group = group, fill = nots)) +
-#'       geom_polygon() +
-#'       coord_equal() +
-#'       geom_path() +
-#'       north(map.df)
-
+#' \dontrun{
+#' library(sf)
+#' data(domestic_violence)
+#' ggplot(domestic_violence, aes(fill = Scaled)) +
+#'     geom_sf() +
+#'     blank() +
+#'     scale_fill_continuous(low = "#fff7ec", high = "#7F0000")
+#' }
 blank <- function() {
     return(
         theme(panel.grid.major = element_line(colour = 'transparent'),

@@ -13,40 +13,13 @@
 #' North symbols are included in the plot with the \code{\link{annotation_custom}} function, which do not works when used together with an empty call to ggplot (see last example). When it is convenient to use an empty call to ggplot, use \code{\link{north2}} instead.
 #' @export
 #' @examples
-#' library(rgdal); library(broom)
-#' dsn <- system.file('extdata', package = 'ggsn')
-#' map <- readOGR(dsn, 'sp')
-#' map@@data$id <- 1:nrow(map@@data)
-#' map.df <- merge(tidy(map), map, by = 'id')
-#' 
-#' ggplot(map.df, aes(long, lat, group = group, fill = nots)) +
-#'     geom_polygon() +
-#'     coord_equal() +
-#'     geom_path() +
-#'     north(map.df) +
-#'     scale_fill_brewer(name = 'Animal abuse\nnotifications', palette = 8)
-#' 
-#' ggplot(data = map.df, aes(long, lat, group = group, fill = nots)) +
-#'     geom_polygon() +
-#'     coord_equal() +
-#'     geom_path() +
-#'     north(map.df, location = 'bottomleft', symbol = 8) +
-#'     scale_fill_brewer(name = 'Animal abuse\nnotifications', palette = 8)
-#' 
-#' ggplot(map.df, aes(long, lat, group = group, fill = nots)) +
-#'     geom_polygon() +
-#'     coord_equal() +
-#'     geom_path() +
-#'     north(data = map.df, location = 'bottomright', scale = 0.2, symbol = 14,
-#'           anchor = c(x = -46.4, y = -23.9)) +
-#'     scale_fill_brewer(name = 'Animal abuse\nnotifications', palette = 8)
-#'
 #' \dontrun{
-#' ggplot() +
-#'    geom_polygon(data = map.df, aes(long, lat, group = group, fill = nots)) +
-#'    coord_equal() +
-#'    geom_path() +
-#'    north(map.df)
+#' library(sf)
+#' data(domestic_violence)
+#' ggplot(domestic_violence, aes(fill = Scaled)) +
+#'     geom_sf() +
+#'     north(domestic_violence, location = "bottomright", symbol = 15) +
+#'     scale_fill_continuous(low = "#fff7ec", high = "#7F0000")
 #' }
 north <- function(data = NULL, location = 'topright', scale = 0.1, symbol = 1, x.min, x.max, y.min, y.max, anchor = NULL) {
     if (is.null(data)) {
@@ -56,12 +29,25 @@ north <- function(data = NULL, location = 'topright', scale = 0.1, symbol = 1, x
         }
         data <- data.frame(long = c(x.min, x.max), lat = c(y.min, y.max))
     }
-    scale.x <- (max(data$long) - min(data$long)) * scale
-    scale.y <- (max(data$lat) - min(data$lat)) * scale
+    if (any(class(data) %in% "sf")) {
+        xmin <- sf::st_bbox(data)["xmin"]
+        xmax <- sf::st_bbox(data)["xmax"]
+        ymin <- sf::st_bbox(data)["ymin"]
+        ymax <- sf::st_bbox(data)["ymax"]
+        scale.x <- (xmax - xmin) * scale
+        scale.y <- (ymax - ymin) * scale
+    } else {
+        xmin <- min(data$long)
+        xmax <- max(data$long)
+        ymin <- min(data$lat)
+        ymax <- max(data$lat)
+        scale.x <- (xmax - xmin) * scale
+        scale.y <- (ymax - ymin) * scale
+    }
     if (location == 'bottomleft') {
         if (is.null(anchor)) {
-            x.min <- min(data$long)
-            y.min <- min(data$lat)
+            x.min <- xmin
+            y.min <- ymin
         } else {
             x.min <- anchor['x']
             y.min <- anchor['y']
@@ -71,8 +57,8 @@ north <- function(data = NULL, location = 'topright', scale = 0.1, symbol = 1, x
     }
     if (location == 'bottomright') {
         if (is.null(anchor)) {
-            x.max <- max(data$long)
-            y.min <- min(data$lat)
+            x.max <- xmax
+            y.min <- ymin
         } else {
             x.max <- anchor['x']
             y.min <- anchor['y']
@@ -82,8 +68,8 @@ north <- function(data = NULL, location = 'topright', scale = 0.1, symbol = 1, x
     }
     if (location == 'topleft') {
         if (is.null(anchor)) {
-            x.min <- min(data$long)
-            y.max <- max(data$lat)
+            x.min <- xmin
+            y.max <- ymax
         } else {
             x.min <- anchor['x']
             y.max <- anchor['y']
@@ -93,8 +79,8 @@ north <- function(data = NULL, location = 'topright', scale = 0.1, symbol = 1, x
     }
     if (location == 'topright') {
         if (is.null(anchor)) {
-            x.max <- max(data$long)
-            y.max <- max(data$lat)
+            x.max <- xmax
+            y.max <- ymax
         } else {
             x.max <- anchor['x']
             y.max <- anchor['y']
@@ -103,10 +89,10 @@ north <- function(data = NULL, location = 'topright', scale = 0.1, symbol = 1, x
         y.min <- y.max - scale.y
     }
     symbol <- sprintf("%02.f", symbol)
-    symbol <- readPNG(paste0(system.file('symbols', package = 'ggsn'),
-                            '/', symbol, '.png'))
-    symbol <- rasterGrob(symbol, interpolate = TRUE)
-    return(annotation_custom(symbol,
-                      xmin = x.min, xmax = x.max,
-                      ymin = y.min, ymax = y.max))
+    symbol <- png::readPNG(paste0(system.file('symbols', package = 'ggsn'),
+                             '/', symbol, '.png'))
+    symbol <- grid::rasterGrob(symbol, interpolate = TRUE)
+    return(annotation_custom(symbol, xmin = x.min, xmax = x.max,
+                             ymin = y.min, 
+                             ymax = y.max))
 }
